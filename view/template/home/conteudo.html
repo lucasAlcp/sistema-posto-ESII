@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Posto</title>
+    <link rel="stylesheet" href="../view/assets/css/bootstrap.css">
+    <script src="../view/assets/js/jquery.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center mt-5">
+                <h1>Sistema de Posto de Gasolina</h1>
+            </div>
+        </div> 
+        <div class="row mt-5">
+          <div class="col-lg-12 text-center">
+            <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#cadastrarFrentista">
+                Cadastrar novo Frentista
+            </button>
+            <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#cadastrarBomba">
+              Cadastrar nova Bomba
+            </button>
+            <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#cadastrarCombustivel">
+              Cadastrar novo combustivel
+            </button>
+          </div>
+          <div class="col-lg-12 mt-5">
+            <button class="btn btn-warning" style="width:100%" type="button" data-bs-toggle="modal" data-bs-target="#novoAbastecimento">
+              Novo Abastecimento
+            </button>
+          </div>
+        </div>
+        <div class="row mt-5 text-center">
+          <div class="col-lg-12">
+            <h2>Combustivel mais vendido</h2>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Quantidade de abastecimentos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>
+                    <?=isset($combustivelMaisVendido->combustivel_id)?$combustivelMaisVendido->combustivel_id:'--'?>
+                  </th>
+                  <td>
+                    <?=$nomeCombustivelMaisVendido?>
+                  </td>
+                  <td>
+                    <?=isset($combustivelMaisVendido->quantidade)?$combustivelMaisVendido->quantidade:'--'?>
+                  </td>
+                </tr>
+                <tr>  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row mt-5 text-center">
+          <div class="col-lg-12">
+            <h2>Frentista que mais abasteceu</h2>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Quantidade de abastecimentos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>
+                      <?=isset($frentistaQueMaisAbasteceu['dados']->frentista_id)?$frentistaQueMaisAbasteceu['dados']->frentista_id:'--'?>
+                    </th>
+                    <td>
+                      <?=$frentistaQueMaisAbasteceu[0]?>
+                    </td>
+                    <td>
+                      <?=isset($frentistaQueMaisAbasteceu['dados']->quantidade)?$frentistaQueMaisAbasteceu['dados']->quantidade:'--'?>
+                    </td>
+                  </tr>
+                  <tr>  
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-lg-4 col-md-6">
+                <div class="col-md-12">
+                    <div class="card" >
+                        <div class="card-header text-center">
+                          Frentistas
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Frentista</th>
+                            <th scope="col">Abastecimentos</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                            foreach($todosFrentistas as $frentista):
+                        ?>
+                          <tr>                            
+                            <th scope="row"><?=$frentista->id?></th>
+                            <td scope="row"><?=$frentista->nome?></td>
+                            <td scope="row">
+                              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal<?=$frentista->id?>">
+                                Abastecimentos
+                              </button>
+                              
+                              <div class="modal fade" id="modal<?=$frentista->id?>" tabindex="-1" aria-labelledby="modal<?=$frentista->id?>" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Todos abastecimentos de <?=$frentista->nome?></h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    
+                                    <div class="modal-body">
+                                      <?php
+                                        $totalAbastecimentos = $posto->totalAbastecimentoPorFrentista($frentista->id);
+                                      ?>
+                                      <h5>Total de Abastecimentos:<?=$totalAbastecimentos[0]?></h5>
+                                      <table class="table table-striped">
+                                        <thead>
+                                      <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Combustivel</th>
+                                        <th scope="col">Quantidade</th>
+                                        <th scope="col">Bomba</th>
+                                        <th scope="col">Preço Total</th>
+                                        <th scope="col">Data</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <?php
+                                      $todosAbastecimentosFrentista = $posto->getTodosAbastecimentoFrentista($frentista->id );
+                                      
+                                      foreach($todosAbastecimentosFrentista as $abastecimento):
+                                      
+                                      $nomeCombustivel = $posto->getCombustivel($abastecimento->combustivel_id);
+                                      ?>     
+                                      <tr>                         
+                                        <th scope="row"><?=$abastecimento->id?></th>
+                                        <td><?=$nomeCombustivel[1]?></td>
+                                        <td><?=$abastecimento->quantidade?></td>
+                                        <td><?=$abastecimento->bomba_id?></td>
+                                        <td>R$ <?=$abastecimento->precoTotal?></td>
+                                        <td><?=$abastecimento->data?></td>
+                                      </tr>
+                                    
+                                      <?php
+                                      endforeach;
+
+                                      ?>
+                                      </tbody>
+                                    
+                                    </table>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        <?php
+                          endforeach;
+                        ?>
+                        </tbody>
+                      
+                        </table>
+    
+                      </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card" >
+                    <div class="card-header text-center">
+                      Bombas
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Combustiveis</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        foreach($todasBombas as $bomba):
+                    ?>
+                      <tr>
+                          
+
+                        <th scope="row"><?=$bomba->id?></th>
+                        <td>
+                            <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?=$bomba->id?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                Combustiveis
+                              </button>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?=$bomba->id?>">
+                                  <?php
+                                    $combustiveis = json_decode($bomba->combustivelDisp);
+                                    foreach($combustiveis as $combustivel):
+                                    $nome= $posto->getCombustivel($combustivel);
+
+                                    if(isset($nome[0])){
+                                  ?>
+                                <li><a class="dropdown-item" href="#"><?=$nome[0]?></a></li>
+                                <?php
+                                    } 
+                                    endforeach;
+                                ?>
+                              </ul>
+                            </div>
+                        </td>
+                      </tr>
+                    <?php
+                      endforeach;
+                    ?>
+                    </tbody>
+                  
+                    </table>
+
+                  </div>
+            </div>
+
+            <div class="col-lg-5 col-md-12 text-center">
+              <div class="col-md-12">
+                  <div class="card" >
+                      <div class="card-header text-center">
+                        Combustiveis
+                      </div>
+                      <table class="table table-striped">
+                          <thead>
+                        <tr>
+                          <th scope="col">ID</th>
+                          <th scope="col">Nome</th>
+                          <th scope="col">Valor Por litro</th>
+                          <th scope="col">Total de Abastecimentos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      <?php
+                          foreach($todosCombustiveis as $combustivel):
+                      ?>
+                        <tr>
+                            
+
+                          <th scope="row"><?=$combustivel->id?></th>
+                          <td><?=$combustivel->nome?></td>
+                          <td><?=$combustivel->valorPorLitro?></td>
+                          <?php
+                            $totalAbastecimentos = $posto->totalAbastecimentoPorCombustivel($combustivel->id);
+                            
+                          ?>
+                          <td><?=$totalAbastecimentos[0]?></td>
+                        </tr>
+                      <?php
+                        endforeach;
+                      ?>
+                      </tbody> 
+                    
+                      </table>
+
+                    </div>
+              </div>
+          </div>
+        </div>
+        <div class="row mt-5">
+            
+
+            <div class="col-md-12">
+                <div class="col-md-12">
+                    <div class="card" >
+                        <div class="card-header text-center">
+                          Todos abastecimentos
+                        </div>
+                        <?php
+                          $total = $posto->QntTodosAbastecimentos();
+                        ?>
+                        <h5 class="text-center">Total:<?=$total[0]?></h5>
+                        <table class="table table-striped">
+                            <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Frentista</th>
+                            <th scope="col">Combustivel</th>
+                            <th scope="col">Bomba</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Preço Total</th>
+                            <th scope="col">Data</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                            if(!empty($todosAbastecimentos)){
+                            foreach($todosAbastecimentos as $abastecimento):
+                            $info = $posto->getInformacoesAbastecimento( $abastecimento->frentista_id, $abastecimento->combustivel_id);
+                        ?>
+                          <tr>
+                              
+
+                            <th scope="row"><?=$abastecimento->id?></th>
+                            <td><?=$info[0]?></td>
+                            <td><?=$info[1]?></td>
+                            <td><?=$abastecimento->bomba_id?></td>
+                            <td><?=$abastecimento->quantidade?></td>
+                            <td>R$ <?=$abastecimento->precoTotal?></td>
+                            <td><?=$abastecimento->data?></td>
+                          </tr>
+                        <?php
+                          endforeach;
+                          }
+                        ?>
+                        </tbody>
+                      
+                        </table>
+
+                      </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- CADASTRAR NOVO FRENTISTA MODAL -->
+  <div class="modal fade" id="cadastrarFrentista" tabindex="-1" aria-labelledby="cadastrarFrentista" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Cadastrar novo Frentista</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/controller/acoes.php" method="POST">
+            <label for="nome" class="form-label">Nome</label>
+            <input required type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome do frentista">
+            <input type="hidden" name="acao" value="cadastrarFrentista">
+            <button type="submit" class="btn btn-primary mt-2">Cadastrar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- CADASTRAR NOVA BOMBA MODAL -->
+   <div class="modal fade" id="cadastrarBomba" tabindex="-1" aria-labelledby="cadastrarBomba" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Cadastrar nova bomba</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/controller/acoes.php" method="POST">
+            <label for=""> Selecione os combustiveis que a bomba terá</label><br>
+            <?php
+              $cont = 0;
+              foreach($todosCombustiveis as $combustivel):
+            ?>
+
+              <div class="row">
+                <div class="col-md-12">
+
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" role="switch" value="<?=$combustivel->id?>" type="checkbox" id="combustivel<?=$cont?>" name="combustivel<?=$cont?>" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="combustivel<?=$cont?>">
+                      <?=$combustivel->nome?>
+                    </label>
+                  </div>
+
+                </div>
+              </div>
+              
+            <?php
+              $cont++;
+              endforeach;
+            ?>
+            <input type="hidden" name="acao" value="cadastrarBomba">
+            <button type="submit" class="btn btn-primary mt-2">Cadastrar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+     <!-- CADASTRAR NOVO COMBUSTIVEL -->
+     <div class="modal fade" id="cadastrarCombustivel" tabindex="-1" aria-labelledby="cadastrarCombustivel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Cadastrar novo combustivel</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="/controller/acoes.php" method="POST">
+              <div class="row">
+                <div class="col-md-12">
+                  <label for="combustivel">Nome</label>
+                  <input class="form-control" required type="text" name="combustivel" id="combustivel" placeholder="Digite o nome do combustivel">
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-md-2">
+                  <span class="form-control">R$:</span>
+                </div>
+                <div class="col-md-6">
+                    <input class="form-control" required type="number" step='0.01' name="valorPorLitro" id="valorPorLitro" placeholder="Digite o valor por litro">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <input type="hidden" name="acao" value="cadastrarCombustivel">
+                  <button type="submit" class="btn btn-primary mt-2">Cadastrar</button>
+                </div>
+              </div>
+              
+              
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+       <!-- CADASTRAR NOVO ABASTECIMENTO -->
+      <div class="modal fade" id="novoAbastecimento" tabindex="-1" aria-labelledby="novoAbastecimento" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Novo abastecimento</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="/controller/acoes.php" method="POST">
+                <!-- BOMBA -->
+                <label for=""> Selecione a Bomba</label><br>
+                <?php
+                  $cont = 0;
+                  foreach($todasBombas as $bomba):
+                ?>
+                  <div class="row">
+                    <div class="col-md-12">
+
+                      <div class="form-check form-switch">
+                        <input required  class="form-check-input" role="switch" value="<?=$bomba->id?>" type="radio" id="bomba<?=$bomba->id?>" name="bomba">
+                        <label class="form-check-label" for="bomba">
+                          <?=$bomba->id?>
+                        </label>
+                      </div>
+
+                      <div class="card d-none cardCombustiveis" id="card<?=$bomba->id?>">
+                        <div class="card-body">
+                          <h5 class="card-title">Selecione o combustivel</h5>
+                          <?php
+                            $combustiveis = json_decode($bomba->combustivelDisp);
+                            foreach($combustiveis as $combustivel):
+                            $combustivel= $posto->getCombustivel($combustivel);
+
+                            if(isset($combustivel[0])){
+                          ?>
+                              <div class="form-check form-switch">
+                                <input class="form-check-input" type="radio" id="combustivel" name="combustivel_id" role="switch" value="<?=$combustivel[0]?>">
+                                <label class="form-check-label" for="combustivel">
+                                  <?=$combustivel[1];?>
+                                </label>
+                              </div>
+                          <?php
+                            }
+                            endforeach;
+                          ?>
+                        </div>
+                      </div>
+                      <script>
+                            $('#bomba<?=$bomba->id?>').change(function(){
+                              if($('#card<?=$bomba->id?>').hasClass('d-none')){
+                                $('.cardCombustiveis').addClass('d-none');
+                                $('#card<?=$bomba->id?>').removeClass('d-none');
+
+                              }else{
+                                $('#card<?=$bomba->id?>').addClass('d-none');
+                              }
+                            });
+                           
+                      </script>
+
+                    </div>
+                  </div>
+                  
+                <?php
+                  $cont++;
+                  endforeach;
+                ?>
+
+                <!-- FRENTISTA -->
+                <label for=""> Selecione o frentista</label><br>
+                <?php
+                  $cont = 0;
+                  foreach($todosFrentistas as $frentista):
+                ?>
+
+                  <div class="row">
+                    <div class="col-md-12">
+
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" role="switch" value="<?=$frentista->id?>" type="radio" id="frentista" name="frentista">
+                        <label class="form-check-label" for="frentista">
+                          <?=$frentista->nome?>
+                        </label>
+                      </div>
+
+                    </div>
+                  </div>
+                  
+                <?php
+                  $cont++;
+                  endforeach;
+                ?>
+                <label for="qntEmLitros">Quantidade em litros</label><br>
+                <input type="number" step='0.01' class="form-control" id="qntEmLitros" name="qntEmLitros" placeholder="Digite a quantidade em litros">
+
+                <input type="hidden" name="acao" value="novoAbastecimento">
+                <button type="submit" class="btn btn-primary mt-2">Cadastrar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+</body>
+<script src="../view/assets/js/bootstrap.min.js"></script>
+<script src="../view/assets/js/bootstrap.bundle.min.js"></script>
+
+</html>
